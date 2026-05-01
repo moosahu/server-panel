@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>مركز التحكم — السيرفر</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+
+/* ── Sidebar ─────────────────────────────────────────── */
+#sb{position:fixed;top:0;right:0;width:230px;height:100vh;
+  background:#1e293b;border-left:1px solid #334155;
+  display:flex;flex-direction:column;z-index:100;overflow-y:auto}
+.sb-brand{padding:20px 16px;border-bottom:1px solid #334155}
+.sb-brand-row{display:flex;align-items:center;gap:10px}
+.sb-brand-icon{font-size:26px}
+.sb-brand-name{font-size:14px;font-weight:900;color:#f1f5f9}
+.sb-brand-sub{font-size:10px;color:#475569;margin-top:2px}
+.server-pill{display:inline-flex;align-items:center;gap:5px;
+  background:#0f172a;border:1px solid #1e3a5f;
+  border-radius:100px;padding:3px 10px;font-size:10px;
+  color:#60a5fa;margin-top:8px;font-family:monospace}
+.server-pill .dot{width:6px;height:6px;border-radius:50%;background:#22c55e;
+  animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+nav{flex:1;padding:12px 10px}
+.nav-section{font-size:10px;color:#475569;font-weight:700;
+  padding:8px 10px 4px;text-transform:uppercase;letter-spacing:.5px}
+nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;
+  border-radius:10px;color:#94a3b8;text-decoration:none;
+  font-size:13px;margin-bottom:2px;transition:.15s}
+nav a:hover{background:#0f172a;color:#e2e8f0}
+nav a.active{background:rgba(59,130,246,.15);color:#60a5fa;
+  border:1px solid rgba(59,130,246,.2)}
+nav a .ni{font-size:15px;width:20px;text-align:center}
+
+.sb-foot{padding:12px 14px;border-top:1px solid #334155}
+.sb-foot a{display:flex;align-items:center;gap:7px;color:#475569;
+  text-decoration:none;font-size:12px;padding:6px 8px;border-radius:8px;transition:.15s}
+.sb-foot a:hover{color:#f87171;background:rgba(239,68,68,.08)}
+
+/* ── Content ─────────────────────────────────────────── */
+#ct{margin-right:230px;padding:28px 24px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-size:20px;font-weight:900;color:#f1f5f9}
+.page-sub{font-size:12px;color:#64748b;margin-top:3px}
+.refresh-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;
+  background:#1e293b;border:1px solid #334155;border-radius:9px;
+  color:#94a3b8;cursor:pointer;font-family:'Cairo',sans-serif;
+  font-size:12px;transition:.15s}
+.refresh-btn:hover{background:#0f172a;color:#e2e8f0}
+
+/* ── System Stats ────────────────────────────────────── */
+.sys-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.sys-card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:18px 16px}
+.sys-label{font-size:11px;color:#64748b;font-weight:600;margin-bottom:8px;
+  display:flex;align-items:center;gap:5px}
+.sys-val{font-size:24px;font-weight:900;color:#f1f5f9;line-height:1}
+.sys-sub{font-size:11px;color:#475569;margin-top:4px}
+.progress{height:5px;background:#0f172a;border-radius:100px;margin-top:8px;overflow:hidden}
+.progress-bar{height:100%;border-radius:100px;transition:width .5s}
+.bar-blue{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+.bar-green{background:linear-gradient(90deg,#22c55e,#4ade80)}
+.bar-amber{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.bar-red{background:linear-gradient(90deg,#ef4444,#f87171)}
+
+/* ── Apps Section ────────────────────────────────────── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:14px;font-weight:700;color:#94a3b8;
+  display:flex;align-items:center;gap:7px}
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:20px}
+.app-card{background:#1e293b;border:1px solid #334155;border-radius:16px;
+  padding:20px;transition:.2s;position:relative;overflow:hidden}
+.app-card::before{content:'';position:absolute;top:0;right:0;
+  width:3px;height:100%;background:var(--app-color,#3b82f6)}
+.app-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.app-icon-wrap{display:flex;align-items:center;gap:10px}
+.app-icon{font-size:28px}
+.app-name{font-size:15px;font-weight:700;color:#f1f5f9}
+.app-desc{font-size:11px;color:#64748b;margin-top:3px}
+.status-badge{display:inline-flex;align-items:center;gap:5px;
+  padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.s-active{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.25)}
+.s-inactive{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.s-loading{background:rgba(148,163,184,.1);color:#94a3b8;border:1px solid #334155}
+.app-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.app-stat{background:#0f172a;border-radius:10px;padding:10px 12px}
+.app-stat-val{font-size:16px;font-weight:900;color:#f1f5f9}
+.app-stat-lbl{font-size:10px;color:#475569;margin-top:2px}
+.app-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:9px;font-family:'Cairo',sans-serif;
+  font-size:12px;font-weight:700;cursor:pointer;border:none;
+  display:inline-flex;align-items:center;gap:5px;transition:.15s;text-decoration:none}
+.btn-restart{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.25)}
+.btn-restart:hover{background:rgba(59,130,246,.22)}
+.btn-danger{background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+.btn-link{background:#0f172a;color:#94a3b8;border:1px solid #334155}
+.btn-link:hover{color:#e2e8f0;border-color:#475569}
+.btn-primary{background:#1d4ed8;color:#fff}
+.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:transparent;color:#64748b;border:1px solid #334155}
+.btn-ghost:hover{background:#0f172a;color:#e2e8f0}
+
+/* ── Add App ────────────────────────────────────── */
+.add-app-card{background:transparent;border:1.5px dashed #334155;
+  border-radius:16px;padding:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  color:#475569;font-size:13px;transition:.15s}
+.add-app-card:hover{border-color:#3b82f6;color:#60a5fa;background:rgba(59,130,246,.05)}
+
+/* ── Logs ────────────────────────────────────────────── */
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px;margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:700;color:#94a3b8;display:flex;align-items:center;gap:7px}
+#log-box{background:#080c14;border:1px solid #1e3a5f;border-radius:10px;
+  padding:14px 16px;font-family:monospace;font-size:11px;color:#4ade80;
+  height:280px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;line-height:1.7}
+#log-box.muted{color:#475569}
+.log-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+select{background:#0f172a;border:1px solid #334155;color:#e2e8f0;
+  border-radius:8px;padding:6px 10px;font-family:'Cairo',sans-serif;font-size:12px;outline:none}
+
+/* ── Alert toast ──────────────────────────────────────── */
+#toast{position:fixed;bottom:24px;left:24px;
+  padding:12px 20px;border-radius:12px;font-size:13px;font-weight:700;
+  display:none;align-items:center;gap:8px;z-index:999;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#toast.ok{background:#14532d;color:#4ade80;border:1px solid #16a34a}
+#toast.err{background:#450a0a;color:#f87171;border:1px solid #dc2626}
+
+/* ── Modal ────────────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;align-items:center;justify-content:center;z-index:500}
+.modal-overlay.open{display:flex}
+.modal{background:#1e293b;border:1px solid #334155;border-radius:20px;
+  padding:28px;width:100%;max-width:480px}
+.modal-title{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:20px}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:12px;color:#64748b;font-weight:600;margin-bottom:5px}
+.form-row input{width:100%;padding:10px 13px;background:#0f172a;
+  border:1.5px solid #334155;border-radius:10px;color:#f1f5f9;
+  font-family:'Cairo',sans-serif;font-size:13px;outline:none;transition:.2s}
+.form-row input:focus{border-color:#3b82f6}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sb">
+  <div class="sb-brand">
+    <div class="sb-brand-row">
+      <span class="sb-brand-icon">⚡</span>
+      <div>
+        <div class="sb-brand-name">مركز التحكم</div>
+        <div class="sb-brand-sub">Server Control Panel</div>
+      </div>
+    </div>
+    <div class="server-pill"><span class="dot"></span>84.8.100.70</div>
+  </div>
+
+  <nav>
+    <div class="nav-section">السيرفر</div>
+    <a href="/" class="active"><span class="ni">📊</span> نظرة عامة</a>
+    <a href="/env"><span class="ni">⚙️</span> متغيرات البيئة</a>
+    <a href="/apps/new"><span class="ni">➕</span> ربط تطبيق</a>
+
+    <div class="nav-section" style="margin-top:8px">التطبيقات</div>
+    {% for ap in apps %}
+    <a href="{{ ap.url }}" target="_blank"><span class="ni">{{ ap.icon }}</span> {{ ap.name }}</a>
+    {% endfor %}
+
+    <div class="nav-section" style="margin-top:8px">روابط سريعة</div>
+    <a href="/cp" target="_blank"><span class="ni">🏫</span> لوحة الإدارة</a>
+    <a href="/cp/kpi" target="_blank"><span class="ni">📈</span> مؤشرات الأداء</a>
+    <a href="/" target="_blank"><span class="ni">🖥️</span> معاينة الشاشة</a>
+    <a href="/kpi" target="_blank"><span class="ni">📋</span> عرض المؤشرات</a>
+  </nav>
+
+  <div class="sb-foot">
+    <a href="/logout">🚪 تسجيل الخروج</a>
+  </div>
+</div>
+
+<!-- Content -->
+<div id="ct">
+  <div class="page-header">
+    <div>
+      <div class="page-title">نظرة عامة على السيرفر</div>
+      <div class="page-sub">Oracle Cloud — me-riyadh-1</div>
+    </div>
+    <button class="refresh-btn" onclick="refreshAll()">🔄 تحديث</button>
+  </div>
+
+  <!-- System Stats -->
+  <div class="sys-grid">
+    <div class="sys-card">
+      <div class="sys-label">💾 الذاكرة RAM</div>
+      <div class="sys-val" id="sys-mem-val">...</div>
+      <div class="sys-sub" id="sys-mem-sub"></div>
+      <div class="progress"><div class="progress-bar bar-blue" id="sys-mem-bar" style="width:0%"></div></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-label">💿 القرص</div>
+      <div class="sys-val" id="sys-disk-val">...</div>
+      <div class="sys-sub" id="sys-disk-sub"></div>
+      <div class="progress"><div class="progress-bar bar-green" id="sys-disk-bar" style="width:0%"></div></div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-label">⚙️ تحميل CPU</div>
+      <div class="sys-val" id="sys-load">...</div>
+      <div class="sys-sub">متوسط دقيقة واحدة</div>
+    </div>
+    <div class="sys-card">
+      <div class="sys-label">⏱️ وقت التشغيل</div>
+      <div class="sys-val" style="font-size:16px" id="sys-uptime">...</div>
+      <div class="sys-sub">منذ آخر إعادة تشغيل</div>
+    </div>
+  </div>
+
+  <!-- Apps -->
+  <div class="section-header">
+    <div class="section-title">🚀 التطبيقات المُدارة</div>
+    <a href="/apps/new" class="btn btn-ghost">➕ ربط تطبيق جديد</a>
+  </div>
+
+  <div class="apps-grid" id="apps-grid">
+    {% for ap in apps %}
+    <div class="app-card" id="card-{{ ap.id }}" style="--app-color:{{ ap.color }}">
+      <div class="app-card-top">
+        <div class="app-icon-wrap">
+          <span class="app-icon">{{ ap.icon }}</span>
+          <div>
+            <div class="app-name">{{ ap.name }}</div>
+            <div class="app-desc">{{ ap.desc }}</div>
+          </div>
+        </div>
+        <span class="status-badge s-loading" id="badge-{{ ap.id }}">⏳ جاري التحقق</span>
+      </div>
+      <div class="app-stats">
+        <div class="app-stat">
+          <div class="app-stat-val" id="mem-{{ ap.id }}">—</div>
+          <div class="app-stat-lbl">ذاكرة (MB)</div>
+        </div>
+        <div class="app-stat">
+          <div class="app-stat-val" id="svc-{{ ap.id }}">{{ ap.service }}</div>
+          <div class="app-stat-lbl">اسم الخدمة</div>
+        </div>
+      </div>
+      <div class="app-actions">
+        <button class="btn btn-restart" onclick="restartApp('{{ ap.service }}', '{{ ap.id }}')">🔄 إعادة تشغيل</button>
+        {% if ap.url %}<a class="btn btn-link" href="{{ ap.url }}" target="_blank">🔗 فتح</a>{% endif %}
+        {% if ap.admin %}<a class="btn btn-link" href="{{ ap.admin }}" target="_blank">🛠️ إدارة</a>{% endif %}
+        <a class="btn btn-ghost" href="/env">⚙️ البيئة</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Logs -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📋 سجل الخدمة</div>
+      <div class="log-controls">
+        <select id="log-service">
+          {% for ap in apps %}
+          <option value="{{ ap.service }}">{{ ap.name }}</option>
+          {% endfor %}
+        </select>
+        <select id="log-lines">
+          <option value="50">50 سطر</option>
+          <option value="100" selected>100 سطر</option>
+          <option value="200">200 سطر</option>
+        </select>
+        <button class="btn btn-ghost" onclick="loadLogs()">🔄 تحديث</button>
+      </div>
+    </div>
+    <div id="log-box" class="muted">جاري التحميل...</div>
+  </div>
+</div>
+
+<!-- Modal: إضافة تطبيق -->
+<div class="modal-overlay" id="modal-add" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-title">➕ إضافة تطبيق جديد</div>
+    <div class="form-row-2">
+      <div class="form-row">
+        <label>المعرّف (id)</label>
+        <input type="text" id="add-id" placeholder="my-app">
+      </div>
+      <div class="form-row">
+        <label>اسم الخدمة (systemd)</label>
+        <input type="text" id="add-service" placeholder="my-app.service">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>الاسم المعروض</label>
+      <input type="text" id="add-name" placeholder="تطبيقي">
+    </div>
+    <div class="form-row">
+      <label>وصف مختصر</label>
+      <input type="text" id="add-desc" placeholder="وصف التطبيق">
+    </div>
+    <div class="form-row-2">
+      <div class="form-row">
+        <label>رابط التطبيق</label>
+        <input type="text" id="add-url" placeholder="http://...">
+      </div>
+      <div class="form-row">
+        <label>رابط الإدارة</label>
+        <input type="text" id="add-admin" placeholder="http://.../admin">
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row">
+        <label>الأيقونة</label>
+        <input type="text" id="add-icon" placeholder="🔧" value="🔧">
+      </div>
+      <div class="form-row">
+        <label>اللون</label>
+        <input type="color" id="add-color" value="#6366f1" style="height:41px;padding:4px">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="addApp()">حفظ</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('modal-add').classList.remove('open')">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+function toast(msg, ok=true){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = ok ? 'ok' : 'err';
+  t.style.display = 'flex';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.style.display='none', 3500);
+}
+
+async function loadSystem(){
+  try{
+    const d = await fetch('/api/system').then(r=>r.json());
+    document.getElementById('sys-mem-val').textContent = d.mem_used_mb + ' MB';
+    document.getElementById('sys-mem-sub').textContent = `من ${d.mem_total_mb} MB — ${d.mem_pct}%`;
+    document.getElementById('sys-mem-bar').style.width = d.mem_pct + '%';
+    document.getElementById('sys-mem-bar').className = 'progress-bar ' + (d.mem_pct>80?'bar-red':d.mem_pct>60?'bar-amber':'bar-blue');
+
+    document.getElementById('sys-disk-val').textContent = d.disk_used_gb + ' GB';
+    document.getElementById('sys-disk-sub').textContent = `من ${d.disk_total_gb} GB — ${d.disk_pct}%`;
+    document.getElementById('sys-disk-bar').style.width = d.disk_pct + '%';
+    document.getElementById('sys-disk-bar').className = 'progress-bar ' + (d.disk_pct>85?'bar-red':d.disk_pct>65?'bar-amber':'bar-green');
+
+    document.getElementById('sys-load').textContent = d.load;
+    document.getElementById('sys-uptime').textContent = d.uptime.replace('up ','');
+  }catch(e){}
+}
+
+async function loadApps(){
+  try{
+    const list = await fetch('/api/apps').then(r=>r.json());
+    list.forEach(a=>{
+      const badge = document.getElementById('badge-'+a.id);
+      const memEl = document.getElementById('mem-'+a.id);
+      if(badge){
+        badge.className = 'status-badge ' + (a.status==='active'?'s-active':'s-inactive');
+        badge.textContent = a.status==='active' ? '● شغّال' : '○ متوقف';
+      }
+      if(memEl) memEl.textContent = a.mem_mb !== undefined ? a.mem_mb : '—';
+    });
+  }catch(e){}
+}
+
+async function loadLogs(){
+  const box = document.getElementById('log-box');
+  box.className = 'muted';
+  box.textContent = 'جاري التحميل...';
+  const svc = document.getElementById('log-service').value;
+  const n   = document.getElementById('log-lines').value;
+  try{
+    const d = await fetch(`/api/logs?service=${svc}&lines=${n}`).then(r=>r.json());
+    box.className = '';
+    box.textContent = d.logs || '(لا يوجد سجل)';
+    box.scrollTop = box.scrollHeight;
+  }catch(e){ box.textContent = 'خطأ في التحميل'; }
+}
+
+async function restartApp(service, appId){
+  if(!confirm(`إعادة تشغيل الخدمة "${service}"؟`)) return;
+  const badge = document.getElementById('badge-'+appId);
+  if(badge){ badge.className='status-badge s-loading'; badge.textContent='⏳ جاري...'; }
+  try{
+    const d = await fetch('/api/restart',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({service})
+    }).then(r=>r.json());
+    if(d.ok){ toast('✓ تمت إعادة التشغيل بنجاح'); }
+    else { toast('✗ ' + (d.error||'خطأ'), false); }
+  }catch(e){ toast('✗ خطأ في الاتصال', false); }
+  setTimeout(loadApps, 2500);
+}
+
+async function addApp(){
+  const data = {
+    id:      document.getElementById('add-id').value.trim(),
+    service: document.getElementById('add-service').value.trim(),
+    name:    document.getElementById('add-name').value.trim(),
+    desc:    document.getElementById('add-desc').value.trim(),
+    url:     document.getElementById('add-url').value.trim(),
+    admin:   document.getElementById('add-admin').value.trim(),
+    icon:    document.getElementById('add-icon').value.trim() || '🔧',
+    color:   document.getElementById('add-color').value,
+  };
+  if(!data.id||!data.service||!data.name){
+    toast('يرجى تعبئة المعرّف والخدمة والاسم على الأقل', false); return;
+  }
+  try{
+    const d = await fetch('/api/app/add',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    }).then(r=>r.json());
+    if(d.ok){ toast('✓ تمت الإضافة — أعد تحميل الصفحة'); document.getElementById('modal-add').classList.remove('open'); }
+    else { toast('✗ '+(d.error||'خطأ'), false); }
+  }catch(e){ toast('✗ خطأ', false); }
+}
+
+function refreshAll(){ loadSystem(); loadApps(); loadLogs(); }
+
+// التحميل عند الفتح
+refreshAll();
+// تحديث تلقائي كل 30 ثانية
+setInterval(refreshAll, 30000);
+
+// تحديث اللوقات عند تغيير الخدمة
+document.getElementById('log-service').addEventListener('change', loadLogs);
+document.getElementById('log-lines').addEventListener('change', loadLogs);
+</script>
+</body>
+</html>

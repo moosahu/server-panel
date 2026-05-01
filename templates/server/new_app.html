@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>ربط تطبيق جديد — مركز التحكم</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+
+#sb{position:fixed;top:0;right:0;width:230px;height:100vh;
+  background:#1e293b;border-left:1px solid #334155;
+  display:flex;flex-direction:column;z-index:100}
+.sb-brand{padding:20px 16px;border-bottom:1px solid #334155}
+.sb-brand-row{display:flex;align-items:center;gap:10px}
+.sb-brand-icon{font-size:26px}
+.sb-brand-name{font-size:14px;font-weight:900;color:#f1f5f9}
+.sb-brand-sub{font-size:10px;color:#475569;margin-top:2px}
+nav{flex:1;padding:12px 10px}
+.nav-section{font-size:10px;color:#475569;font-weight:700;padding:8px 10px 4px}
+nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;
+  color:#94a3b8;text-decoration:none;font-size:13px;margin-bottom:2px;transition:.15s}
+nav a:hover{background:#0f172a;color:#e2e8f0}
+nav a.active{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.2)}
+nav a .ni{font-size:15px;width:20px;text-align:center}
+.sb-foot{padding:12px 14px;border-top:1px solid #334155}
+.sb-foot a{display:flex;align-items:center;gap:7px;color:#475569;
+  text-decoration:none;font-size:12px;padding:6px 8px;border-radius:8px;transition:.15s}
+.sb-foot a:hover{color:#f87171}
+
+#ct{margin-right:230px;padding:28px 24px;max-width:720px}
+.page-title{font-size:20px;font-weight:900;color:#f1f5f9;margin-bottom:6px}
+.page-sub{font-size:12px;color:#64748b;margin-bottom:28px}
+
+/* Steps */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:32px}
+.step{display:flex;align-items:center;gap:8px}
+.step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step.done .step-num{background:#22c55e;color:#fff}
+.step.active .step-num{background:#6366f1;color:#fff}
+.step.pending .step-num{background:#1e293b;border:1.5px solid #334155;color:#475569}
+.step-label{font-size:12px;font-weight:600}
+.step.active .step-label{color:#a5b4fc}
+.step.done .step-label{color:#4ade80}
+.step.pending .step-label{color:#475569}
+.step-line{flex:1;height:1px;background:#334155;margin:0 8px;min-width:20px}
+
+/* Cards */
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:20px;
+  display:flex;align-items:center;gap:7px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{margin-bottom:0}
+.form-group.full{grid-column:1/-1}
+label{display:block;font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+input,select{width:100%;padding:11px 14px;background:#0f172a;border:1.5px solid #334155;
+  border-radius:10px;color:#f1f5f9;font-family:'Cairo',sans-serif;font-size:13px;
+  outline:none;transition:.2s}
+input:focus,select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+input::placeholder{color:#334155}
+.hint{font-size:10px;color:#475569;margin-top:5px}
+.preview{font-family:monospace;font-size:11px;color:#60a5fa;background:#0f172a;
+  border:1px solid #1e3a5f;border-radius:8px;padding:8px 12px;margin-top:6px}
+
+/* Buttons */
+.btn{padding:11px 22px;border-radius:10px;font-family:'Cairo',sans-serif;
+  font-size:13px;font-weight:700;cursor:pointer;border:none;
+  display:inline-flex;align-items:center;gap:6px;transition:.15s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:#64748b;border:1px solid #334155}
+.btn-ghost:hover{background:#0f172a;color:#e2e8f0}
+.btns{display:flex;gap:10px;margin-top:20px}
+
+/* Deploy log */
+#deploy-section{display:none}
+#log{background:#080c14;border:1px solid #1e3a5f;border-radius:12px;
+  padding:16px;font-family:monospace;font-size:12px;
+  min-height:200px;max-height:360px;overflow-y:auto;line-height:1.8}
+.log-ok{color:#4ade80}
+.log-err{color:#f87171}
+.log-info{color:#94a3b8}
+.spinner{display:inline-block;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Success */
+#success-section{display:none;text-align:center;padding:40px 20px}
+.success-icon{font-size:64px;margin-bottom:16px}
+.success-title{font-size:22px;font-weight:900;color:#4ade80;margin-bottom:8px}
+.success-sub{font-size:13px;color:#64748b;margin-bottom:24px}
+</style>
+</head>
+<body>
+
+<div id="sb">
+  <div class="sb-brand">
+    <div class="sb-brand-row">
+      <span class="sb-brand-icon">⚡</span>
+      <div>
+        <div class="sb-brand-name">مركز التحكم</div>
+        <div class="sb-brand-sub">Server Control Panel</div>
+      </div>
+    </div>
+  </div>
+  <nav>
+    <div class="nav-section">السيرفر</div>
+    <a href="/"><span class="ni">📊</span> نظرة عامة</a>
+    <a href="/env"><span class="ni">⚙️</span> متغيرات البيئة</a>
+    <a href="/apps/new" class="active"><span class="ni">➕</span> ربط تطبيق</a>
+    <div class="nav-section" style="margin-top:8px">روابط سريعة</div>
+    <a href="/cp" target="_blank"><span class="ni">🏫</span> لوحة الإدارة</a>
+    <a href="/" target="_blank"><span class="ni">🖥️</span> معاينة الشاشة</a>
+  </nav>
+  <div class="sb-foot">
+    <a href="/logout">🚪 تسجيل الخروج</a>
+  </div>
+</div>
+
+<div id="ct">
+  <div class="page-title">➕ ربط تطبيق جديد</div>
+  <div class="page-sub">أدخل بيانات التطبيق وسيتم النشر تلقائياً من GitHub</div>
+
+  <!-- Steps -->
+  <div class="steps">
+    <div class="step active" id="s1">
+      <div class="step-num">1</div>
+      <div class="step-label">معلومات التطبيق</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step pending" id="s2">
+      <div class="step-num">2</div>
+      <div class="step-label">إعدادات التشغيل</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step pending" id="s3">
+      <div class="step-num">3</div>
+      <div class="step-label">النشر</div>
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-title">📦 معلومات التطبيق</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>اسم التطبيق</label>
+          <input type="text" id="name" placeholder="تطبيقي المدرسي">
+        </div>
+        <div class="form-group">
+          <label>المعرّف (بالإنجليزية)</label>
+          <input type="text" id="app-id" placeholder="my-app" oninput="updatePreview()">
+        </div>
+        <div class="form-group full">
+          <label>مستودع GitHub</label>
+          <input type="text" id="repo" placeholder="moosahu/اسم-المستودع" oninput="updatePreview()">
+          <div class="hint">مثال: moosahu/school-display</div>
+        </div>
+        <div class="form-group">
+          <label>الأيقونة</label>
+          <input type="text" id="icon" value="🔧" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label>اللون</label>
+          <input type="color" id="color" value="#6366f1" style="height:44px;padding:4px 8px">
+        </div>
+      </div>
+      <div id="clone-preview" style="display:none">
+        <div style="font-size:11px;color:#64748b;margin-top:14px;margin-bottom:5px">سيتم الاستنساخ إلى:</div>
+        <div class="preview" id="clone-path"></div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-primary" onclick="goStep2()">التالي ←</button>
+      <a href="/" class="btn btn-ghost">إلغاء</a>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="card-title">⚙️ إعدادات التشغيل</div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>أمر التشغيل</label>
+          <input type="text" id="cmd" placeholder="python3 app.py">
+          <div class="hint">مثال: python3 app.py — أو: gunicorn -w 2 -b 0.0.0.0:5002 app:app</div>
+        </div>
+        <div class="form-group">
+          <label>المنفذ (Port)</label>
+          <input type="number" id="port" placeholder="5002">
+        </div>
+        <div class="form-group">
+          <label>GitHub Token (اختياري)</label>
+          <input type="password" id="gh-token" placeholder="ghp_xxxx...">
+          <div class="hint">لإضافة Webhook تلقائياً على GitHub</div>
+        </div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-primary" onclick="startDeploy()">🚀 ابدأ النشر</button>
+      <button class="btn btn-ghost" onclick="goBack()">→ رجوع</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Deploy Log -->
+  <div id="deploy-section">
+    <div class="card">
+      <div class="card-title"><span class="spinner" id="deploy-spinner">⏳</span> <span id="deploy-title">جاري النشر...</span></div>
+      <div id="log"></div>
+    </div>
+  </div>
+
+  <!-- Success -->
+  <div id="success-section">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">تم النشر بنجاح!</div>
+    <div class="success-sub" id="success-msg"></div>
+    <div class="btns" style="justify-content:center">
+      <a href="/" class="btn btn-primary">← مركز التحكم</a>
+      <a href="#" id="app-link" class="btn btn-ghost" target="_blank">🔗 فتح التطبيق</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function updatePreview(){
+  const repo = document.getElementById('repo').value.trim();
+  const id   = document.getElementById('app-id').value.trim();
+  const prev = document.getElementById('clone-preview');
+  const path = document.getElementById('clone-path');
+  if(repo || id){
+    prev.style.display='block';
+    const appId = id || repo.split('/').pop();
+    path.textContent = `/home/ubuntu/${appId}   ←   git@github.com:${repo}.git`;
+  } else {
+    prev.style.display='none';
+  }
+}
+
+function goStep2(){
+  const name = document.getElementById('name').value.trim();
+  const repo = document.getElementById('repo').value.trim();
+  const id   = document.getElementById('app-id').value.trim();
+  if(!name || !repo){ alert('يرجى إدخال الاسم والمستودع'); return; }
+  if(!id) document.getElementById('app-id').value = repo.split('/').pop();
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  setStep(2);
+}
+
+function goBack(){
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step1').style.display='block';
+  setStep(1);
+}
+
+function setStep(n){
+  [1,2,3].forEach(i=>{
+    const el = document.getElementById('s'+i);
+    el.className = 'step ' + (i<n?'done':i===n?'active':'pending');
+  });
+}
+
+async function startDeploy(){
+  const payload = {
+    name:      document.getElementById('name').value.trim(),
+    id:        document.getElementById('app-id').value.trim(),
+    repo:      document.getElementById('repo').value.trim(),
+    cmd:       document.getElementById('cmd').value.trim(),
+    port:      document.getElementById('port').value.trim(),
+    icon:      document.getElementById('icon').value.trim() || '🔧',
+    color:     document.getElementById('color').value,
+    gh_token:  document.getElementById('gh-token').value.trim(),
+  };
+  if(!payload.cmd){ alert('أدخل أمر التشغيل'); return; }
+
+  document.getElementById('step2').style.display='none';
+  document.getElementById('deploy-section').style.display='block';
+  setStep(3);
+
+  const log = document.getElementById('log');
+  log.innerHTML = '';
+
+  function addLine(msg, ok){
+    const div = document.createElement('div');
+    div.className = ok===true?'log-ok':ok===false?'log-err':'log-info';
+    div.textContent = (ok===true?'✓ ':ok===false?'✗ ':'  ') + msg;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  try{
+    const res = await fetch('/apps/deploy',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = '';
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+      buf += decoder.decode(value, {stream:true});
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for(const line of lines){
+        if(!line.startsWith('data:')) continue;
+        const raw = line.slice(5).trim();
+        if(raw === 'DONE'){
+          document.getElementById('deploy-spinner').textContent = '✓';
+          document.getElementById('deploy-title').textContent = 'اكتمل النشر';
+          document.getElementById('deploy-section').style.display='none';
+          document.getElementById('success-section').style.display='block';
+          const port = document.getElementById('port').value.trim();
+          document.getElementById('success-msg').textContent = payload.name + ' جاهز على السيرفر';
+          if(port) document.getElementById('app-link').href = 'http://84.8.100.70:'+port;
+          return;
+        }
+        try{
+          const d = JSON.parse(raw);
+          addLine(d.msg, d.ok);
+        }catch{}
+      }
+    }
+  }catch(e){
+    addLine('خطأ في الاتصال: '+e.message, false);
+  }
+}
+</script>
+</body>
+</html>
