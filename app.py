@@ -429,6 +429,30 @@ def env():
     return render_template('server/env.html', env=env_vars, saved=saved)
 
 
+@app.route('/change-password', methods=['GET', 'POST'])
+@server_required
+def change_password():
+    error = saved = None
+    if request.method == 'POST':
+        current  = request.form.get('current', '')
+        new_pw   = request.form.get('new_pw', '').strip()
+        confirm  = request.form.get('confirm', '').strip()
+        if current != SERVER_PASSWORD:
+            error = 'كلمة المرور الحالية غير صحيحة'
+        elif len(new_pw) < 6:
+            error = 'كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل'
+        elif new_pw != confirm:
+            error = 'كلمة المرور الجديدة وتأكيدها غير متطابقين'
+        else:
+            env = _read_env()
+            env['SERVER_PASSWORD'] = new_pw
+            _write_env(env)
+            global SERVER_PASSWORD
+            SERVER_PASSWORD = new_pw
+            saved = True
+    return render_template('server/change_password.html', error=error, saved=saved)
+
+
 if __name__ == '__main__':
     load_dotenv()
     app.run(host='0.0.0.0', port=4998, debug=False, use_reloader=False)
