@@ -432,11 +432,12 @@ def env():
 @app.route('/change-password', methods=['GET', 'POST'])
 @server_required
 def change_password():
+    global SERVER_PASSWORD
     error = saved = None
     if request.method == 'POST':
-        current  = request.form.get('current', '')
-        new_pw   = request.form.get('new_pw', '').strip()
-        confirm  = request.form.get('confirm', '').strip()
+        current = request.form.get('current', '')
+        new_pw  = request.form.get('new_pw', '').strip()
+        confirm = request.form.get('confirm', '').strip()
         if current != SERVER_PASSWORD:
             error = 'كلمة المرور الحالية غير صحيحة'
         elif len(new_pw) < 6:
@@ -447,7 +448,6 @@ def change_password():
             env = _read_env()
             env['SERVER_PASSWORD'] = new_pw
             _write_env(env)
-            global SERVER_PASSWORD
             SERVER_PASSWORD = new_pw
             saved = True
     return render_template('server/change_password.html', error=error, saved=saved)
