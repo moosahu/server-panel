@@ -86,6 +86,14 @@ def _write_env(env: dict):
             f.write(f'{k}={v}\n')
 
 
+# ── Fix SCRIPT_NAME from Nginx X-Script-Name header ──────
+@app.before_request
+def fix_script_name():
+    prefix = request.headers.get('X-Script-Name', '')
+    if prefix:
+        request.environ['SCRIPT_NAME'] = prefix
+
+
 # ── Decorator ─────────────────────────────────────────────
 
 def server_required(f):

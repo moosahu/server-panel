@@ -165,9 +165,9 @@ select{background:#0f172a;border:1px solid #334155;color:#e2e8f0;
 
   <nav>
     <div class="nav-section">السيرفر</div>
-    <a href="/" class="active"><span class="ni">📊</span> نظرة عامة</a>
-    <a href="/env"><span class="ni">⚙️</span> متغيرات البيئة</a>
-    <a href="/apps/new"><span class="ni">➕</span> ربط تطبيق</a>
+    <a href="{{ url_for('dashboard') }}" class="active"><span class="ni">📊</span> نظرة عامة</a>
+    <a href="{{ url_for('env') }}"><span class="ni">⚙️</span> متغيرات البيئة</a>
+    <a href="{{ url_for('new_app') }}"><span class="ni">➕</span> ربط تطبيق</a>
 
     <div class="nav-section" style="margin-top:8px">التطبيقات</div>
     {% for ap in apps %}
@@ -182,7 +182,7 @@ select{background:#0f172a;border:1px solid #334155;color:#e2e8f0;
   </nav>
 
   <div class="sb-foot">
-    <a href="/logout">🚪 تسجيل الخروج</a>
+    <a href="{{ url_for('logout') }}">🚪 تسجيل الخروج</a>
   </div>
 </div>
 
@@ -225,7 +225,7 @@ select{background:#0f172a;border:1px solid #334155;color:#e2e8f0;
   <!-- Apps -->
   <div class="section-header">
     <div class="section-title">🚀 التطبيقات المُدارة</div>
-    <a href="/apps/new" class="btn btn-ghost">➕ ربط تطبيق جديد</a>
+    <a href="{{ url_for('new_app') }}" class="btn btn-ghost">➕ ربط تطبيق جديد</a>
   </div>
 
   <div class="apps-grid" id="apps-grid">
@@ -255,7 +255,7 @@ select{background:#0f172a;border:1px solid #334155;color:#e2e8f0;
         <button class="btn btn-restart" onclick="restartApp('{{ ap.service }}', '{{ ap.id }}')">🔄 إعادة تشغيل</button>
         {% if ap.url %}<a class="btn btn-link" href="{{ ap.url }}" target="_blank">🔗 فتح</a>{% endif %}
         {% if ap.admin %}<a class="btn btn-link" href="{{ ap.admin }}" target="_blank">🛠️ إدارة</a>{% endif %}
-        <a class="btn btn-ghost" href="/env">⚙️ البيئة</a>
+        <a class="btn btn-ghost" href="{{ url_for('env') }}">⚙️ البيئة</a>
       </div>
     </div>
     {% endfor %}
