@@ -6,31 +6,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Cairo',sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+body{font-family:'Cairo',sans-serif;background:#0f1f4a;color:#F0F4FF;min-height:100vh}
 
 #sb{position:fixed;top:0;right:0;width:230px;height:100vh;
-  background:#1e293b;border-left:1px solid #334155;
+  background:#0a1840;border-left:1px solid #1e3a7a;
   display:flex;flex-direction:column;z-index:100}
-.sb-brand{padding:20px 16px;border-bottom:1px solid #334155}
+.sb-brand{padding:20px 16px;border-bottom:1px solid #1e3a7a}
 .sb-brand-row{display:flex;align-items:center;gap:10px}
 .sb-brand-icon{font-size:26px}
-.sb-brand-name{font-size:14px;font-weight:900;color:#f1f5f9}
-.sb-brand-sub{font-size:10px;color:#475569;margin-top:2px}
+.sb-brand-name{font-size:14px;font-weight:900;color:#F0F4FF}
+.sb-brand-sub{font-size:10px;color:#3b5ea6;margin-top:2px}
 nav{flex:1;padding:12px 10px}
-.nav-section{font-size:10px;color:#475569;font-weight:700;padding:8px 10px 4px}
+.nav-section{font-size:10px;color:#3b5ea6;font-weight:700;padding:8px 10px 4px}
 nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;
-  color:#94a3b8;text-decoration:none;font-size:13px;margin-bottom:2px;transition:.15s}
-nav a:hover{background:#0f172a;color:#e2e8f0}
-nav a.active{background:rgba(99,102,241,.15);color:#a5b4fc;border:1px solid rgba(99,102,241,.2)}
+  color:#93c5fd;text-decoration:none;font-size:13px;margin-bottom:2px;transition:.15s}
+nav a:hover{background:#0f1f4a;color:#F0F4FF}
+nav a.active{background:rgba(99,102,241,.15);color:#93c5fd;border:1px solid rgba(99,102,241,.2)}
 nav a .ni{font-size:15px;width:20px;text-align:center}
-.sb-foot{padding:12px 14px;border-top:1px solid #334155}
-.sb-foot a{display:flex;align-items:center;gap:7px;color:#475569;
+.sb-foot{padding:12px 14px;border-top:1px solid #1e3a7a}
+.sb-foot a{display:flex;align-items:center;gap:7px;color:#3b5ea6;
   text-decoration:none;font-size:12px;padding:6px 8px;border-radius:8px;transition:.15s}
 .sb-foot a:hover{color:#f87171}
 
 #ct{margin-right:230px;padding:28px 24px;max-width:720px}
-.page-title{font-size:20px;font-weight:900;color:#f1f5f9;margin-bottom:6px}
-.page-sub{font-size:12px;color:#64748b;margin-bottom:28px}
+.page-title{font-size:20px;font-weight:900;color:#F0F4FF;margin-bottom:6px}
+.page-sub{font-size:12px;color:#3b5ea6;margin-bottom:28px}
 
 /* Steps */
 .steps{display:flex;align-items:center;gap:0;margin-bottom:32px}
@@ -38,40 +38,40 @@ nav a .ni{font-size:15px;width:20px;text-align:center}
 .step-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
   justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
 .step.done .step-num{background:#22c55e;color:#fff}
-.step.active .step-num{background:#6366f1;color:#fff}
-.step.pending .step-num{background:#1e293b;border:1.5px solid #334155;color:#475569}
+.step.active .step-num{background:#1D6FE8;color:#fff}
+.step.pending .step-num{background:#0a1840;border:1.5px solid #1e3a7a;color:#3b5ea6}
 .step-label{font-size:12px;font-weight:600}
-.step.active .step-label{color:#a5b4fc}
+.step.active .step-label{color:#93c5fd}
 .step.done .step-label{color:#4ade80}
-.step.pending .step-label{color:#475569}
-.step-line{flex:1;height:1px;background:#334155;margin:0 8px;min-width:20px}
+.step.pending .step-label{color:#3b5ea6}
+.step-line{flex:1;height:1px;background:#1e3a7a;margin:0 8px;min-width:20px}
 
 /* Cards */
-.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:24px;margin-bottom:16px}
-.card-title{font-size:14px;font-weight:700;color:#94a3b8;margin-bottom:20px;
+.card{background:#0a1840;border:1px solid #1e3a7a;border-radius:16px;padding:24px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:700;color:#93c5fd;margin-bottom:20px;
   display:flex;align-items:center;gap:7px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-group{margin-bottom:0}
 .form-group.full{grid-column:1/-1}
-label{display:block;font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
-input,select{width:100%;padding:11px 14px;background:#0f172a;border:1.5px solid #334155;
-  border-radius:10px;color:#f1f5f9;font-family:'Cairo',sans-serif;font-size:13px;
+label{display:block;font-size:11px;color:#3b5ea6;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+input,select{width:100%;padding:11px 14px;background:#0f1f4a;border:1.5px solid #1e3a7a;
+  border-radius:10px;color:#F0F4FF;font-family:'Cairo',sans-serif;font-size:13px;
   outline:none;transition:.2s}
-input:focus,select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-input::placeholder{color:#334155}
-.hint{font-size:10px;color:#475569;margin-top:5px}
-.preview{font-family:monospace;font-size:11px;color:#60a5fa;background:#0f172a;
+input:focus,select:focus{border-color:#1D6FE8;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+input::placeholder{color:#1e3a7a}
+.hint{font-size:10px;color:#3b5ea6;margin-top:5px}
+.preview{font-family:monospace;font-size:11px;color:#93c5fd;background:#0f1f4a;
   border:1px solid #1e3a5f;border-radius:8px;padding:8px 12px;margin-top:6px}
 
 /* Buttons */
 .btn{padding:11px 22px;border-radius:10px;font-family:'Cairo',sans-serif;
   font-size:13px;font-weight:700;cursor:pointer;border:none;
   display:inline-flex;align-items:center;gap:6px;transition:.15s;text-decoration:none}
-.btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff}
+.btn-primary{background:linear-gradient(135deg,#1D6FE8,#1563d4);color:#fff}
 .btn-primary:hover{filter:brightness(1.1)}
 .btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.btn-ghost{background:transparent;color:#64748b;border:1px solid #334155}
-.btn-ghost:hover{background:#0f172a;color:#e2e8f0}
+.btn-ghost{background:transparent;color:#3b5ea6;border:1px solid #1e3a7a}
+.btn-ghost:hover{background:#0f1f4a;color:#F0F4FF}
 .btns{display:flex;gap:10px;margin-top:20px}
 
 /* Deploy log */
@@ -81,7 +81,7 @@ input::placeholder{color:#334155}
   min-height:200px;max-height:360px;overflow-y:auto;line-height:1.8}
 .log-ok{color:#4ade80}
 .log-err{color:#f87171}
-.log-info{color:#94a3b8}
+.log-info{color:#93c5fd}
 .spinner{display:inline-block;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -89,7 +89,7 @@ input::placeholder{color:#334155}
 #success-section{display:none;text-align:center;padding:40px 20px}
 .success-icon{font-size:64px;margin-bottom:16px}
 .success-title{font-size:22px;font-weight:900;color:#4ade80;margin-bottom:8px}
-.success-sub{font-size:13px;color:#64748b;margin-bottom:24px}
+.success-sub{font-size:13px;color:#3b5ea6;margin-bottom:24px}
 </style>
 </head>
 <body>
@@ -164,11 +164,11 @@ input::placeholder{color:#334155}
         </div>
         <div class="form-group">
           <label>اللون</label>
-          <input type="color" id="color" value="#6366f1" style="height:44px;padding:4px 8px">
+          <input type="color" id="color" value="#1D6FE8" style="height:44px;padding:4px 8px">
         </div>
       </div>
       <div id="clone-preview" style="display:none">
-        <div style="font-size:11px;color:#64748b;margin-top:14px;margin-bottom:5px">سيتم الاستنساخ إلى:</div>
+        <div style="font-size:11px;color:#3b5ea6;margin-top:14px;margin-bottom:5px">سيتم الاستنساخ إلى:</div>
         <div class="preview" id="clone-path"></div>
       </div>
     </div>
