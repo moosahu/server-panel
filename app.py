@@ -18,10 +18,15 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
 
 # ── Config ────────────────────────────────────────────────
-SERVER_PASSWORD  = os.environ.get('SERVER_PASSWORD', 'server123')
+SERVER_PASSWORD = os.environ.get('SERVER_PASSWORD')
+if not SERVER_PASSWORD:
+    raise RuntimeError('SERVER_PASSWORD غير محدد في ملف .env — لا يمكن تشغيل التطبيق')
 ENV_FILE         = '/home/ubuntu/samsung_screen/.env'
 SERVICE_NAME     = 'samsung-screen'
 DEPLOY_APPS_CONFIG = '/home/ubuntu/deploy_apps.json'
@@ -107,8 +112,10 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.pop('_server_admin', None)
-    return redirect(url_for('login'))
+    session.clear()
+    response = redirect(url_for('login'))
+    response.delete_cookie(app.session_cookie_name)
+    return response
 
 
 @app.route('/')
