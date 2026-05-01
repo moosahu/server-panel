@@ -12,9 +12,13 @@ from flask import (
     render_template, jsonify, Response, stream_with_context
 )
 from dotenv import load_dotenv
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
 
 # ── Config ────────────────────────────────────────────────
 SERVER_PASSWORD  = os.environ.get('SERVER_PASSWORD', 'server123')
