@@ -336,6 +336,9 @@ select{background:#0f172a;border:1px solid #334155;color:#e2e8f0;
 <div id="toast"></div>
 
 <script>
+const BASE = "{{ request.script_root }}";
+function api(path){ return BASE + path; }
+
 function toast(msg, ok=true){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -347,7 +350,7 @@ function toast(msg, ok=true){
 
 async function loadSystem(){
   try{
-    const d = await fetch('/api/system').then(r=>r.json());
+    const d = await fetch(api('/api/system')).then(r=>r.json());
     document.getElementById('sys-mem-val').textContent = d.mem_used_mb + ' MB';
     document.getElementById('sys-mem-sub').textContent = `من ${d.mem_total_mb} MB — ${d.mem_pct}%`;
     document.getElementById('sys-mem-bar').style.width = d.mem_pct + '%';
@@ -365,7 +368,7 @@ async function loadSystem(){
 
 async function loadApps(){
   try{
-    const list = await fetch('/api/apps').then(r=>r.json());
+    const list = await fetch(api('/api/apps')).then(r=>r.json());
     list.forEach(a=>{
       const badge = document.getElementById('badge-'+a.id);
       const memEl = document.getElementById('mem-'+a.id);
@@ -385,7 +388,7 @@ async function loadLogs(){
   const svc = document.getElementById('log-service').value;
   const n   = document.getElementById('log-lines').value;
   try{
-    const d = await fetch(`/api/logs?service=${svc}&lines=${n}`).then(r=>r.json());
+    const d = await fetch(api(`/api/logs?service=${svc}&lines=${n}`)).then(r=>r.json());
     box.className = '';
     box.textContent = d.logs || '(لا يوجد سجل)';
     box.scrollTop = box.scrollHeight;
@@ -397,7 +400,7 @@ async function restartApp(service, appId){
   const badge = document.getElementById('badge-'+appId);
   if(badge){ badge.className='status-badge s-loading'; badge.textContent='⏳ جاري...'; }
   try{
-    const d = await fetch('/api/restart',{
+    const d = await fetch(api('/api/restart'),{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({service})
     }).then(r=>r.json());
@@ -422,7 +425,7 @@ async function addApp(){
     toast('يرجى تعبئة المعرّف والخدمة والاسم على الأقل', false); return;
   }
   try{
-    const d = await fetch('/api/app/add',{
+    const d = await fetch(api('/api/app/add'),{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify(data)
     }).then(r=>r.json());
