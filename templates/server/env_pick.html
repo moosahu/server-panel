@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>اختر التطبيق — متغيرات البيئة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',sans-serif;background:#0f1f4a;color:#F0F4FF;min-height:100vh}
+
+#sb{position:fixed;top:0;right:0;width:230px;height:100vh;
+  background:#0a1840;border-left:1px solid #1e3a7a;
+  display:flex;flex-direction:column;z-index:100}
+.sb-brand{padding:20px 16px;border-bottom:1px solid #1e3a7a}
+.sb-brand-row{display:flex;align-items:center;gap:10px}
+.sb-brand-icon{font-size:26px}
+.sb-brand-name{font-size:14px;font-weight:900;color:#F0F4FF}
+.sb-brand-sub{font-size:10px;color:#3b5ea6;margin-top:2px}
+.server-pill{display:inline-flex;align-items:center;gap:5px;
+  background:#0f1f4a;border:1px solid #1e3a5f;
+  border-radius:100px;padding:3px 10px;font-size:10px;
+  color:#93c5fd;margin-top:8px;font-family:monospace}
+.server-pill .dot{width:6px;height:6px;border-radius:50%;background:#22c55e;
+  animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+nav{flex:1;padding:12px 10px}
+.nav-section{font-size:10px;color:#3b5ea6;font-weight:700;
+  padding:8px 10px 4px;text-transform:uppercase;letter-spacing:.5px}
+nav a{display:flex;align-items:center;gap:9px;padding:9px 12px;
+  border-radius:10px;color:#93c5fd;text-decoration:none;
+  font-size:13px;margin-bottom:2px;transition:.15s}
+nav a:hover{background:#0f1f4a;color:#F0F4FF}
+nav a.active{background:rgba(59,130,246,.15);color:#93c5fd;
+  border:1px solid rgba(59,130,246,.2)}
+nav a .ni{font-size:15px;width:20px;text-align:center}
+.sb-foot{padding:12px 14px;border-top:1px solid #1e3a7a}
+.sb-foot a{display:flex;align-items:center;gap:7px;color:#3b5ea6;
+  text-decoration:none;font-size:12px;padding:6px 8px;border-radius:8px;transition:.15s}
+.sb-foot a:hover{color:#f87171;background:rgba(239,68,68,.08)}
+
+#ct{margin-right:230px;padding:28px 24px}
+.page-title{font-size:20px;font-weight:900;color:#F0F4FF;margin-bottom:6px}
+.page-sub{font-size:12px;color:#3b5ea6;margin-bottom:24px}
+
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.app-card{background:#0a1840;border:1px solid #1e3a7a;border-radius:16px;
+  padding:22px;text-decoration:none;color:#F0F4FF;transition:.15s;
+  display:flex;flex-direction:column;gap:10px}
+.app-card:hover{border-color:#1D6FE8;background:#0d2255;transform:translateY(-2px)}
+.app-icon{font-size:32px}
+.app-name{font-size:15px;font-weight:900}
+.app-path{font-size:10px;color:#3b5ea6;font-family:monospace;word-break:break-all}
+</style>
+</head>
+<body>
+
+<div id="sb">
+  <div class="sb-brand">
+    <div class="sb-brand-row">
+      <span class="sb-brand-icon">⚡</span>
+      <div>
+        <div class="sb-brand-name">مركز التحكم</div>
+        <div class="sb-brand-sub">Server Control Panel</div>
+      </div>
+    </div>
+    <div class="server-pill"><span class="dot"></span>84.8.100.70</div>
+  </div>
+  <nav>
+    <div class="nav-section">السيرفر</div>
+    <a href="{{ url_for('dashboard') }}"><span class="ni">📊</span> نظرة عامة</a>
+    <a href="{{ url_for('env') }}" class="active"><span class="ni">⚙️</span> متغيرات البيئة</a>
+    <a href="{{ url_for('new_app') }}"><span class="ni">➕</span> ربط تطبيق</a>
+    <a href="{{ url_for('change_password') }}"><span class="ni">🔑</span> تغيير كلمة المرور</a>
+    <div class="nav-section" style="margin-top:8px">روابط سريعة</div>
+    <a href="/cp" target="_blank"><span class="ni">🏫</span> لوحة الإدارة</a>
+    <a href="/" target="_blank"><span class="ni">🖥️</span> معاينة الشاشة</a>
+  </nav>
+  <div class="sb-foot">
+    <a href="{{ url_for('logout') }}">🚪 تسجيل الخروج</a>
+  </div>
+</div>
+
+<div id="ct">
+  <div class="page-title">⚙️ متغيرات البيئة</div>
+  <div class="page-sub">اختر التطبيق لتعديل ملف .env الخاص به</div>
+
+  <div class="apps-grid">
+    {% for a in apps %}
+    <a class="app-card" href="{{ url_for('env', app=a.id) }}">
+      <div class="app-icon">{{ a.icon }}</div>
+      <div class="app-name">{{ a.name }}</div>
+      <div class="app-path">{{ a.env_file or '—' }}</div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+</body>
+</html>

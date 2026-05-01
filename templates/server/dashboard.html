@@ -256,7 +256,7 @@ select{background:#0f1f4a;border:1px solid #1e3a7a;color:#F0F4FF;
         <button class="btn btn-restart" onclick="restartApp('{{ ap.service }}', '{{ ap.id }}')">🔄 إعادة تشغيل</button>
         {% if ap.url %}<a class="btn btn-link" href="{{ ap.url }}" target="_blank">🔗 فتح</a>{% endif %}
         {% if ap.admin %}<a class="btn btn-link" href="{{ ap.admin }}" target="_blank">🛠️ إدارة</a>{% endif %}
-        <a class="btn btn-ghost" href="{{ url_for('env') }}">⚙️ البيئة</a>
+        <a class="btn btn-ghost" href="{{ url_for('env', app=ap.id) }}">⚙️ البيئة</a>
       </div>
     </div>
     {% endfor %}

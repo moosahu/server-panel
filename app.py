@@ -33,24 +33,26 @@ DEPLOY_APPS_CONFIG = '/home/ubuntu/deploy_apps.json'
 
 MANAGED_APPS = [
     {
-        'id':      'samsung-screen',
-        'name':    'شاشة المدرسة',
-        'desc':    'شاشة العرض المدرسية والجدول الدراسي',
-        'icon':    '🖥️',
-        'service': 'samsung-screen',
-        'url':     'http://84.8.100.70',
-        'admin':   'http://84.8.100.70/cp',
-        'color':   '#3b82f6',
+        'id':       'samsung-screen',
+        'name':     'شاشة المدرسة',
+        'desc':     'شاشة العرض المدرسية والجدول الدراسي',
+        'icon':     '🖥️',
+        'service':  'samsung-screen',
+        'url':      'http://84.8.100.70',
+        'admin':    'http://84.8.100.70/cp',
+        'color':    '#3b82f6',
+        'env_file': '/home/ubuntu/samsung_screen/.env',
     },
     {
-        'id':      'tg-transfer',
-        'name':    'نقل تيليجرام',
-        'desc':    'أداة نقل الملفات بين قنوات تيليجرام',
-        'icon':    '📨',
-        'service': 'tg-transfer',
-        'url':     'http://84.8.100.70:5000',
-        'admin':   '',
-        'color':   '#6366f1',
+        'id':       'tg-transfer',
+        'name':     'نقل تيليجرام',
+        'desc':     'أداة نقل الملفات بين قنوات تيليجرام',
+        'icon':     '📨',
+        'service':  'tg-transfer',
+        'url':      'http://84.8.100.70:5000',
+        'admin':    '',
+        'color':    '#6366f1',
+        'env_file': '/home/ubuntu/tg.env',
     },
 ]
 
@@ -66,11 +68,11 @@ def _run(cmd: list, timeout=10) -> str:
         return str(e)
 
 
-def _read_env():
-    """قراءة ملف .env كقاموس."""
+def _read_env(path=None):
+    path = path or ENV_FILE
     env = {}
-    if os.path.exists(ENV_FILE):
-        with open(ENV_FILE, 'r') as f:
+    if os.path.exists(path):
+        with open(path, 'r') as f:
             for line in f:
                 line = line.strip()
                 if line and not line.startswith('#') and '=' in line:
@@ -79,9 +81,9 @@ def _read_env():
     return env
 
 
-def _write_env(env: dict):
-    """كتابة القاموس إلى ملف .env."""
-    with open(ENV_FILE, 'w') as f:
+def _write_env(env: dict, path=None):
+    path = path or ENV_FILE
+    with open(path, 'w') as f:
         for k, v in env.items():
             f.write(f'{k}={v}\n')
 
@@ -411,8 +413,16 @@ WantedBy=multi-user.target
 @app.route('/env', methods=['GET', 'POST'])
 @server_required
 def env():
-    saved = False
-    env_vars = _read_env()
+    app_id   = request.args.get('app') or request.form.get('app_id', '')
+    app_cfg  = next((a for a in MANAGED_APPS if a['id'] == app_id), None)
+    if not app_cfg:
+        # إذا لم يُحدَّد تطبيق، اعرض صفحة اختيار
+        return render_template('server/env_pick.html', apps=MANAGED_APPS)
+
+    env_file = app_cfg.get('env_file', ENV_FILE)
+    saved    = False
+    env_vars = _read_env(env_file)
+
     if request.method == 'POST':
         new_env = {}
         keys   = request.form.getlist('key')
@@ -421,12 +431,13 @@ def env():
             k = k.strip()
             if k:
                 new_env[k] = v.strip()
-        _write_env(new_env)
-        for k, v in new_env.items():
-            os.environ[k] = v
+        _write_env(new_env, env_file)
         env_vars = new_env
-        saved = True
-    return render_template('server/env.html', env=env_vars, saved=saved)
+        saved    = True
+
+    return render_template('server/env.html',
+                           env=env_vars, saved=saved,
+                           app_cfg=app_cfg)
 
 
 @app.route('/change-password', methods=['GET', 'POST'])
